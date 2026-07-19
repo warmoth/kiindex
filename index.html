@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHRONO PRESS — Brian Warmoth's Links</title>
+<meta name="description" content="Brian Warmoth — links to his work, writing, and social profiles, presented as the main menu of a fictional 1994 MS-DOS game about a time-traveling newspaper editor.">
+<style>
+  :root{
+    --bg:       #000000;
+    --fg:       #aaaaaa; /* body text, DOS light gray */
+    --white:    #ffffff; /* headers */
+    --cyan:     #55ffff; /* borders */
+    --yellow:   #ffff55; /* highlight/selection */
+    --blue:     #5555ff;
+    --magenta:  #ff55ff;
+    --green:    #55ff55;
+    --dim-cyan: #1f8f8f;
+    --font: "Perfect DOS VGA 437", "IBM Plex Mono", "Courier New", monospace;
+  }
+
+  *,*::before,*::after{ box-sizing:border-box; }
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:var(--font);
+    height:100%;
+    overflow-x:hidden;
+  }
+
+  body{
+    min-height:100vh;
+    position:relative;
+    text-rendering:optimizeLegibility;
+  }
+
+  a{ color:inherit; text-decoration:none; }
+
+  .visually-hidden{
+    position:absolute !important;
+    width:1px;height:1px;
+    padding:0;margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+  }
+
+  /* ============ BACKGROUND ERA MOTIFS ============ */
+  .era-bg{
+    position:fixed;
+    inset:0;
+    z-index:1;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .era-layer{
+    position:absolute;
+    inset:-5% -5% -5% -5%;
+    margin:0;
+    font-size:13px;
+    line-height:1.15;
+    letter-spacing:2px;
+    white-space:pre;
+    opacity:0;
+    animation:eraFade 60s infinite ease-in-out;
+    will-change:opacity, transform;
+  }
+  .era-layer[data-era="press"]{ color:var(--fg); animation-delay:-0s; }
+  .era-layer[data-era="telegraph"]{ color:var(--green); animation-delay:-12s; }
+  .era-layer[data-era="static"]{ color:var(--cyan); animation-delay:-24s; }
+  .era-layer[data-era="wire"]{ color:var(--yellow); animation-delay:-36s; transform:rotate(-2deg); }
+  .era-layer[data-era="hologram"]{
+    color:var(--magenta);
+    animation-delay:-48s;
+    background:
+      repeating-linear-gradient(115deg,
+        rgba(85,255,255,0.10) 0px,
+        rgba(85,255,255,0.10) 2px,
+        transparent 2px,
+        transparent 6px),
+      linear-gradient(120deg, rgba(255,85,255,0.06), rgba(85,255,255,0.06));
+  }
+
+  @keyframes eraFade{
+    0%   { opacity:0;    transform:translateY(0); }
+    2%   { opacity:0.16; }
+    16%  { opacity:0.16; transform:translateY(-1%); }
+    20%  { opacity:0;    transform:translateY(0); }
+    100% { opacity:0; }
+  }
+
+  /* ============ TICKER STRIP ============ */
+  .ticker{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:5;
+    height:1.9em;
+    background:#000;
+    border-bottom:1px solid var(--dim-cyan);
+    overflow:hidden;
+    white-space:nowrap;
+  }
+  .ticker-track{
+    display:inline-block;
+    padding-left:100%;
+    color:var(--white);
+    font-size:0.85em;
+    line-height:1.9em;
+    animation:tickerScroll 42s linear infinite;
+  }
+  .ticker-track .sep{ color:var(--yellow); padding:0 1em; }
+  @keyframes tickerScroll{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(-50%); }
+  }
+
+  /* ============ CRT OVERLAY ============ */
+  .crt-overlay{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    pointer-events:none;
+  }
+  .crt-overlay::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.0) 0px,
+      rgba(0,0,0,0.0) 1px,
+      rgba(0,0,0,0.22) 2px,
+      rgba(0,0,0,0.22) 3px
+    );
+    animation:scanJitter 7s infinite steps(1);
+  }
+  .crt-overlay::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%);
+    animation:flicker 5.5s infinite;
+  }
+  @keyframes scanJitter{
+    0%,92%,100%{ transform:translateY(0); }
+    94%{ transform:translateY(1px); }
+    96%{ transform:translateY(-1px); }
+  }
+  @keyframes flicker{
+    0%,19%,21%,49%,51%,79%,81%,100%{ opacity:1; }
+    20%{ opacity:0.94; }
+    50%{ opacity:0.97; }
+    80%{ opacity:0.93; }
+  }
+
+  /* ============ LAYOUT / SCREEN ============ */
+  .screen{
+    position:relative;
+    z-index:10;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:2.4em 0.8em 1.2em;
+  }
+
+  /* ============ BOX-DRAWING FRAME ============ */
+  .frame{
+    width:min(96vw, 58ch);
+    color:var(--cyan);
+    font-size:clamp(12px, 2.4vw, 16px);
+  }
+  .frame-edge{ display:flex; line-height:1; }
+  .frame-edge .corner{ flex:0 0 auto; }
+  .hline{
+    flex:1 1 auto;
+    overflow:hidden;
+    white-space:nowrap;
+  }
+  .hline span{ letter-spacing:0; }
+  .frame-row{
+    display:flex;
+    align-items:stretch;
+    line-height:1.5;
+  }
+  .frame-row > .side{ flex:0 0 auto; }
+  .frame-row .content{
+    flex:1 1 auto;
+    min-width:0;
+    padding:0 0.6em;
+    color:var(--fg);
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  /* ============ TITLE BANNER ============ */
+  .banner{
+    margin:0.5em 0 0.15em;
+    text-align:center;
+    color:var(--white);
+    font-weight:normal;
+    font-size:clamp(1.5em, 6vw, 2.7em);
+    letter-spacing:0.14em;
+    line-height:1.1;
+    text-shadow:
+      1px 0 0 var(--cyan),
+      -1px 0 0 var(--cyan),
+      0 2px 0 rgba(85,255,255,0.35),
+      0 4px 10px rgba(85,255,255,0.25);
+  }
+  .subtitle{
+    text-align:center;
+    margin:0 0 0.6em;
+    color:var(--dim-cyan);
+    letter-spacing:0.25em;
+    font-size:0.85em;
+  }
+  .hint-line{
+    text-align:center;
+    color:#666;
+    font-size:0.78em;
+    letter-spacing:0.05em;
+    padding:0.35em 0;
+  }
+  .hint-line kbd{
+    font-family:inherit;
+    color:var(--yellow);
+    background:none;
+    border:none;
+    padding:0;
+  }
+
+  /* ============ MENU LIST ============ */
+  .menu-list{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  .menu-list li{
+    margin:0;
+    display:flex;
+    align-items:stretch;
+  }
+  .menu-list li::before,
+  .menu-list li::after{
+    content:"\2551";
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    background:#000;
+    color:var(--cyan);
+  }
+  .menu-list a{
+    display:flex;
+    align-items:center;
+    flex:1 1 auto;
+    min-width:0;
+    padding:0.3em 0.6em;
+    color:var(--fg);
+  }
+  .menu-list .arrow{
+    display:inline-block;
+    width:1.4em;
+    flex:0 0 auto;
+    color:var(--yellow);
+  }
+  .menu-list li:not(.selected) .arrow::before{ content:"\00a0\00a0"; }
+  .menu-list li.selected .arrow::before{
+    content:"\276f\00a0";
+    animation:arrowBlink 1s steps(1) infinite;
+  }
+  .menu-list .idx{
+    color:var(--dim-cyan);
+    flex:0 0 auto;
+    padding-right:0.6em;
+  }
+  .menu-list li.selected .idx{ color:var(--yellow); }
+  .menu-list .label{
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    flex:1 1 auto;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .menu-list li.selected,
+  .menu-list a:hover,
+  .menu-list a:focus-visible{
+    background:var(--yellow);
+  }
+  .menu-list li.selected a,
+  .menu-list a:hover,
+  .menu-list a:focus-visible{
+    color:#000;
+  }
+  .menu-list li.selected .idx,
+  .menu-list a:hover .idx,
+  .menu-list a:focus-visible .idx{
+    color:#000;
+  }
+  .menu-list a:focus-visible{
+    outline:2px dashed #000;
+    outline-offset:-3px;
+  }
+  .menu-list a:focus{ outline:none; }
+  .menu-list a:focus-visible{ outline:2px dashed #000; }
+
+  @keyframes arrowBlink{
+    0%,49%{ opacity:1; }
+    50%,100%{ opacity:0; }
+  }
+
+  /* ============ READY PROMPT / FOOTER ============ */
+  .ready-line{
+    text-align:left;
+    padding:0.4em 0.6em 0.1em;
+    color:var(--white);
+  }
+  .ready-line .cursor{
+    display:inline-block;
+    width:0.6em;
+    height:1em;
+    background:var(--white);
+    vertical-align:text-bottom;
+    animation:cursorBlink 1s steps(1) infinite;
+    margin-left:0.15em;
+  }
+  @keyframes cursorBlink{
+    0%,49%{ opacity:1; }
+    50%,100%{ opacity:0; }
+  }
+  .copyright{
+    text-align:center;
+    color:#666;
+    font-size:0.78em;
+    padding:0.3em 0.6em 0.6em;
+    letter-spacing:0.03em;
+  }
+
+  /* ============ REDUCED MOTION ============ */
+  @media (prefers-reduced-motion: reduce){
+    .era-layer{
+      animation:none !important;
+      opacity:0.05 !important;
+      transform:none !important;
+    }
+    .ticker-track{ animation:none !important; }
+    .crt-overlay::before,
+    .crt-overlay::after{ animation:none !important; }
+    .menu-list li.selected .arrow::before,
+    .ready-line .cursor{ animation:none !important; opacity:1 !important; }
+  }
+
+  @media (max-width:420px){
+    .ticker{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Decorative background: media-history motifs drifting behind the menu -->
+  <div class="era-bg" aria-hidden="true">
+    <pre class="era-layer" data-era="press"></pre>
+    <pre class="era-layer" data-era="telegraph"></pre>
+    <pre class="era-layer" data-era="static"></pre>
+    <pre class="era-layer" data-era="wire"></pre>
+    <div class="era-layer" data-era="hologram"></div>
+  </div>
+
+  <!-- Decorative wire-service ticker -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+
+  <!-- CRT scanline / vignette / flicker overlay -->
+  <div class="crt-overlay" aria-hidden="true"></div>
+
+  <div class="screen">
+    <div class="frame">
+
+      <div class="frame-edge" aria-hidden="true">
+        <span class="corner">&#9556;</span><div class="hline"><span>&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;</span></div><span class="corner">&#9559;</span>
+      </div>
+
+      <div class="frame-row"><span class="side">&#9553;</span><div class="content">
+        <header>
+          <h1 class="banner">CHRONO PRESS</h1>
+          <p class="subtitle">A NEWSPAPER ACROSS TIME</p>
+        </header>
+      </div><span class="side">&#9553;</span></div>
+
+      <div class="frame-edge" aria-hidden="true">
+        <span class="corner">&#9568;</span><div class="hline"><span>&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;</span></div><span class="corner">&#9571;</span>
+      </div>
+
+      <div class="frame-row"><span class="side">&#9553;</span><div class="content">
+        <p class="hint-line"><kbd>&#9650;&#9660;</kbd> SELECT&nbsp;&nbsp;<kbd>ENTER</kbd> CHOOSE&nbsp;&nbsp;<kbd>1-9,0</kbd> JUMP</p>
+      </div><span class="side">&#9553;</span></div>
+
+      <nav aria-label="Main menu">
+        <ul class="menu-list" id="menuList">
+          <li><a href="https://www.warmoth.org" target="_blank" rel="noopener"><span class="arrow"></span><span class="idx">[1]</span><span class="label">My Work</span></a></li>
+          <li><a href="https://www.digitalcommerce360.com" target="_blank" rel="noopener"><span class="arrow"></span><span class="idx">[2]</span><span class="label">Digital Commerce 360</span></a></li>
+          <li><a href="https://www.linkedin.com/in/brianwarmoth/" target="_blank" rel="noopener"><span class="arrow"></span><span class="idx">[3]</span><span class="label">LinkedIn</span></a></li>
+          <li><a href="https://www.sidebars.net/" target="_blank" rel="noopener"><span class="arrow"></span><span class="idx">[4]</span><span class="label">Substack</span></a></li>
+          <li><a href="https://www.aiartifacts.net/" target="_blank" rel="noopener"><span class="arrow"></span><span class="idx">[5]</span><span class="label">The AI Artifacts Podcast</span></a></li>
+          <li><a href="https://twitter.com/warmoth" target="_blank" rel="noopener"><span class="arrow"></span><span class="idx">[6]</span><span class="label">Twitter</span></a></li>
+          <li><a href="https://www.threads.net/@brianwarmoth" target="_blank" rel="noopener"><span class="arrow"></span><span class="idx">[7]</span><span class="label">Threads</span></a></li>
+          <li><a href="https://bsky.app/profile/warmoth.me" target="_blank" rel="noopener"><span class="arrow"></span><span class="idx">[8]</span><span class="label">Bluesky</span></a></li>
+          <li><a href="https://medium.com/@warmoth" target="_blank" rel="noopener"><span class="arrow"></span><span class="idx">[9]</span><span class="label">Medium</span></a></li>
+          <li><a href="mailto:brian@warmoth.org"><span class="arrow"></span><span class="idx">[0]</span><span class="label">Contact Me</span></a></li>
+        </ul>
+      </nav>
+
+      <div class="frame-edge" aria-hidden="true">
+        <span class="corner">&#9568;</span><div class="hline"><span>&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;</span></div><span class="corner">&#9571;</span>
+      </div>
+
+      <footer>
+        <div class="frame-row"><span class="side">&#9553;</span><div class="content">
+          <p class="ready-line">C:\CHRONO&gt; READY<span class="cursor" aria-hidden="true"></span></p>
+        </div><span class="side">&#9553;</span></div>
+        <div class="frame-row"><span class="side">&#9553;</span><div class="content">
+          <p class="copyright">(C) 1994 CHRONOWARE INTERACTIVE &mdash; V1.0</p>
+        </div><span class="side">&#9553;</span></div>
+      </footer>
+
+      <div class="frame-edge" aria-hidden="true">
+        <span class="corner">&#9562;</span><div class="hline"><span>&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;</span></div><span class="corner">&#9565;</span>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- generate decorative background motifs ---------- */
+  function fillGrid(el, cols, rows, chars, spaced){
+    var out = [];
+    for (var r = 0; r < rows; r++){
+      var line = "";
+      for (var c = 0; c < cols; c++){
+        line += chars[Math.floor(Math.random() * chars.length)];
+        if (spaced) line += " ";
+      }
+      out.push(line);
+    }
+    el.textContent = out.join("\n");
+  }
+
+  var press = document.querySelector('[data-era="press"]');
+  if (press) fillGrid(press, 40, 60, "█▓▒░ ", false);
+
+  var telegraph = document.querySelector('[data-era="telegraph"]');
+  if (telegraph) fillGrid(telegraph, 46, 55, "·–   ", false);
+
+  var stat = document.querySelector('[data-era="static"]');
+  if (stat) fillGrid(stat, 50, 60, "░▒▓ .:'` ", false);
+
+  var wire = document.querySelector('[data-era="wire"]');
+  if (wire){
+    var headlines = [
+      "WIRE SERVICE: PRESSES ROLL AT DAWN",
+      "EXTRA EXTRA: TIME MACHINE INK STILL WET",
+      "BULLETIN FROM THE FUTURE DESK",
+      "DATELINE UNKNOWN -- STORY DEVELOPING"
+    ];
+    var lines = [];
+    for (var i = 0; i < 26; i++){
+      lines.push(headlines[i % headlines.length]);
+    }
+    wire.textContent = lines.join("\n");
+  }
+
+  /* ---------- ticker headlines ---------- */
+  var tickerHeadlines = [
+    "CAVE WALL BULLETIN: MAMMOTH HERD SIGHTED NORTH RIDGE",
+    "GUTENBERG PRESS SHIP DELAYED AT PORT",
+    "TELEGRAPH WIRE DOWN BETWEEN STATIONS 4 AND 7",
+    "RADIO BULLETIN: MARKETS CLOSE MIXED",
+    "TONIGHT ON TELEVISION: THE EVENING REPORT",
+    "BREAKING ON THE WEB: SITE TRAFFIC SURGES",
+    "FUTURE DESK: HOLOGRAPHIC EDITION NOW PRINTING LIGHT",
+    "CHRONO PRESS: A NEWSPAPER ACROSS TIME"
+  ];
+  var tickerText = tickerHeadlines.join("  •  ") + "  •  ";
+  var track = document.getElementById("tickerTrack");
+  if (track){
+    track.textContent = tickerText + tickerText;
+  }
+
+  /* ---------- DOS-style menu navigation ---------- */
+  var links = Array.prototype.slice.call(document.querySelectorAll("#menuList a"));
+  var selected = 0;
+
+  function updateSelection(moveFocus){
+    links.forEach(function(a, i){
+      var row = a.closest("li");
+      if (row) row.classList.toggle("selected", i === selected);
+    });
+    if (moveFocus) links[selected].focus();
+  }
+
+  links.forEach(function(a, i){
+    a.addEventListener("focus", function(){
+      selected = i;
+      updateSelection(false);
+    });
+  });
+
+  document.addEventListener("keydown", function(e){
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+    if (e.key === "ArrowDown" || e.key === "ArrowUp"){
+      e.preventDefault();
+      var dir = e.key === "ArrowDown" ? 1 : -1;
+      selected = (selected + dir + links.length) % links.length;
+      updateSelection(true);
+      return;
+    }
+
+    if (/^[0-9]$/.test(e.key)){
+      var digit = parseInt(e.key, 10);
+      var idx = digit === 0 ? 9 : digit - 1;
+      if (idx < links.length){
+        e.preventDefault();
+        selected = idx;
+        updateSelection(true);
+        links[selected].click();
+      }
+    }
+  });
+
+  updateSelection(false);
+})();
+</script>
+</body>
+</html>
